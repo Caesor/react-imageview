@@ -1,11 +1,12 @@
-/* AlloyFinger v0.1.0
+ /* AlloyFinger v0.1.0
  * By dntzhang
+ * Reedited by nemoliao
  * Github: https://github.com/AlloyTeam/AlloyFinger
  */
 
-import React from 'react';
+import React, { Component } from 'react';
 
-export default class AlloyFinger extends React.Component {
+export default class AlloyFinger extends Component {
     constructor(props) {
         super(props);
 
@@ -23,29 +24,29 @@ export default class AlloyFinger extends React.Component {
         this.preTapPosition={x:null,y:null};
     }
 
-     getLen(v) {
+    getLen(v) {
         return Math.sqrt(v.x * v.x + v.y * v.y);
     }
 
-     dot(v1, v2) {
+    dot(v1, v2) {
         return v1.x * v2.x + v1.y * v2.y;
     }
 
-     getAngle(v1, v2) {
-        var mr = getLen(v1) * getLen(v2);
+    getAngle(v1, v2) {
+        var mr = this.getLen(v1) * this.getLen(v2);
         if (mr === 0) return 0;
-        var r = dot(v1, v2) / mr;
+        var r = this.dot(v1, v2) / mr;
         if (r > 1) r = 1;
         return Math.acos(r);
     }
 
-     cross(v1, v2) {
+    cross(v1, v2) {
         return v1.x * v2.y - v2.x * v1.y;
     }
 
-     getRotateAngle(v1, v2) {
-        var angle = getAngle(v1, v2);
-        if (cross(v1, v2) > 0) {
+    getRotateAngle(v1, v2) {
+        var angle = this.getAngle(v1, v2);
+        if (this.cross(v1, v2) > 0) {
             angle *= -1;
         }
 
@@ -53,13 +54,18 @@ export default class AlloyFinger extends React.Component {
     }
 
     _resetState() {
-        this.setState({x: null, y: null, swiping: false, start: 0 });
+        this.setState({
+            x: null, 
+            y: null, 
+            swiping: false, 
+            start: 0
+        });
     }
 
 
-    _emitEvent(name, e) {
+    _emitEvent(name, ...arg) {
         if (this.props[name]) {
-            this.props[name](e);
+            this.props[name](...arg);
         }
     }
 
@@ -82,30 +88,28 @@ export default class AlloyFinger extends React.Component {
            var v = { x: evt.touches[1].pageX - this.x1, y: evt.touches[1].pageY - this.y1 };
            preV.x = v.x;
            preV.y = v.y;
-           this.pinchStartLen = getLen(preV);
+           this.pinchStartLen = this.getLen(preV);
            this._emitEvent('onMultipointStart', evt);
        }
-       this.longTapTimeout = setTimeout(function(){
+       this.longTapTimeout = setTimeout(() => {
            this._emitEvent('onLongTap', evt);
-       }.bind(this), 750);
+       }, 750);
     }
 
     _handleTouchMove(evt){
         var preV = this.preV,
-                    len = evt.touches.length,
-                    currentX = evt.touches[0].pageX,
-                    currentY = evt.touches[0].pageY;
+            len = evt.touches.length,
+            currentX = evt.touches[0].pageX,
+            currentY = evt.touches[0].pageY;
         this.isDoubleTap=false;
         if (len > 1) {
             var v = { x: evt.touches[1].pageX - currentX, y: evt.touches[1].pageY - currentY };
-
             if (preV.x !== null) {
                 if (this.pinchStartLen > 0) {
-                    evt.scale = getLen(v) / this.pinchStartLen;
+                    evt.scale = this.getLen(v) / this.pinchStartLen;
                     this._emitEvent('onPinch', evt);
                 }
-
-                evt.angle = getRotateAngle(v, preV);
+                evt.angle = this.getRotateAngle(v, preV);
                 this._emitEvent('onRotate', evt);
             }
             preV.x = v.x;
@@ -137,23 +141,27 @@ export default class AlloyFinger extends React.Component {
     _handleTouchEnd(evt){
 
         this._cancelLongTap();
-        var self = this;
+
         if( evt.touches.length<2){
             this._emitEvent('onMultipointEnd', evt);
         }
 
+        evt.point = [this.x1, this.y1];
+
         if ((this.x2 && Math.abs(this.x1 - this.x2) > 30) ||
             (this.y2 && Math.abs(this.preV.y - this.y2) > 30)) {
             evt.direction = this._swipeDirection(this.x1, this.x2, this.y1, this.y2);
-            this.swipeTimeout = setTimeout(function () {
-                self._emitEvent('onSwipe', evt);
+            evt.distance = Math.abs(this.x1 - this.x2);
+            this.swipeTimeout = setTimeout(() => {
+                this._emitEvent('onSwipe', evt);
             }, 0)
         } else {
-            this.tapTimeout = setTimeout(function () {
-                self._emitEvent('onTap', evt);
-                if (self.isDoubleTap) {
-                    self._emitEvent('onDoubleTap', evt);
-                    self.isDoubleTap = false;
+            this.tapTimeout = setTimeout(() => {
+                this._emitEvent('onTap', evt);
+                if (this.isDoubleTap) {
+                    // debugger
+                    this._emitEvent('onDoubleTap', evt);
+                    this.isDoubleTap = false;
                 }
             }, 0)
         }

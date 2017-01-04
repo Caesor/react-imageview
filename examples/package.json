@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server --history-api-fallback --no-info --open"
+    "start": "webpack-dev-server --history-api-fallback --no-info --open",
+    "dev": "webpack --progress --colors --watch"
   },
   "author": "",
   "license": "ISC",
