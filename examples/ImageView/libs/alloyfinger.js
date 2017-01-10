@@ -17,6 +17,8 @@ export default class AlloyFinger extends Component {
         this.delta = null;
         this.last = null;
         this.now = null;
+        this.end = null;
+        this.multiTouch = null;
         this.tapTimeout = null;
         this.longTapTimeout = null;
         this.swipeTimeout=null;
@@ -84,6 +86,7 @@ export default class AlloyFinger extends Component {
        this.last = this.now;
        var preV = this.preV,
            len = evt.touches.length;
+
        if (len > 1) {
            var v = { x: evt.touches[1].pageX - this.x1, y: evt.touches[1].pageY - this.y1 };
            preV.x = v.x;
@@ -114,6 +117,7 @@ export default class AlloyFinger extends Component {
             }
             preV.x = v.x;
             preV.y = v.y;
+            this.multiTouch = true;
         } else {
             if (this.x2 !== null) {
                 evt.deltaX = currentX - this.x2;
@@ -127,6 +131,7 @@ export default class AlloyFinger extends Component {
         this._cancelLongTap();
         this.x2 = currentX;
         this.y2 = currentY;
+
         if(len > 1) {
             evt.preventDefault();
         }
@@ -140,30 +145,32 @@ export default class AlloyFinger extends Component {
 
     _handleTouchEnd(evt){
 
+        this.end = Date.now();
         this._cancelLongTap();
 
         if( evt.touches.length<2){
             this._emitEvent('onMultipointEnd', evt);
         }
 
-        evt.point = [this.x1, this.y1];
-
-        if ((this.x2 && Math.abs(this.x1 - this.x2) > 30) ||
-            (this.y2 && Math.abs(this.preV.y - this.y2) > 30)) {
-            evt.direction = this._swipeDirection(this.x1, this.x2, this.y1, this.y2);
-            evt.distance = Math.abs(this.x1 - this.x2);
-            this.swipeTimeout = setTimeout(() => {
-                this._emitEvent('onSwipe', evt);
-            }, 0)
-        } else {
-            this.tapTimeout = setTimeout(() => {
-                this._emitEvent('onTap', evt);
-                if (this.isDoubleTap) {
-                    // debugger
-                    this._emitEvent('onDoubleTap', evt);
-                    this.isDoubleTap = false;
-                }
-            }, 0)
+        evt.origin = [this.x1, this.y1];
+        if(this.multiTouch === false){
+            if ((this.x2 && Math.abs(this.x1 - this.x2) > 30) ||
+                (this.y2 && Math.abs(this.preV.y - this.y2) > 30)) {
+                evt.direction = this._swipeDirection(this.x1, this.x2, this.y1, this.y2);
+                evt.distance = Math.abs(this.x1 - this.x2);
+                this.swipeTimeout = setTimeout(() => {
+                    this._emitEvent('onSwipe', evt);
+                }, 0)
+            } else {
+                this.tapTimeout = setTimeout(() => {
+                    this._emitEvent('onTap', evt);
+                    if (this.isDoubleTap) {
+                        // debugger
+                        this._emitEvent('onDoubleTap', evt);
+                        this.isDoubleTap = false;
+                    }
+                }, 0)
+            }
         }
 
         this.preV.x = 0;
@@ -171,6 +178,7 @@ export default class AlloyFinger extends Component {
         this.scale = 1;
         this.pinchStartLen = null;
         this.x1 = this.x2 = this.y1 = this.y2 = null;
+        this.multiTouch = false;
     }
 
     _cancelLongTap () {
@@ -178,7 +186,13 @@ export default class AlloyFinger extends Component {
     }
 
     _swipeDirection (x1, x2, y1, y2) {
-        return Math.abs(x1 - x2) >= Math.abs(y1 - y2) ? (x1 - x2 > 0 ? 'Left' : 'Right') : (y1 - y2 > 0 ? 'Up' : 'Down')
+        // console.log('time:',this.end-this.now);
+        if(Math.abs(x1 - x2) > 80 || this.end-this.now < 250){
+            return Math.abs(x1 - x2) >= Math.abs(y1 - y2) ? (x1 - x2 > 0 ? 'Left' : 'Right') : (y1 - y2 > 0 ? 'Up' : 'Down')    
+        }else {
+            return 'Nochange'
+        }
+        
     }
 
     render() {

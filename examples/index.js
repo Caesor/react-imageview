@@ -6,9 +6,7 @@ import Mlogger from '@tencent/mlogger'
 class Main extends Component {
     constructor(){
         super();
-        Mlogger.init({
-            
-        });
+        Mlogger.init({});
     }
 
     render() {
