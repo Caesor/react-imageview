@@ -4,13 +4,12 @@ var path = require('path'),
 
 var config = {
     entry: {
-        "react-ios-alert": './src/index.js'
+        "react-imageview": './src/index.js'
     },
     externals: {
         "react": "react",
         "react-dom": "react-dom",
-        "react-singleton": "react-singleton",
-        "react-tap-event": "react-tap-event"
+        "react-singleton": "react-singleton"
     },
     module: {
         loaders: [
@@ -32,7 +31,7 @@ var config = {
     },
     output: {
         path: 'dist/',
-        library: 'react-alert',
+        library: 'react-imageview',
         libraryTarget: 'umd'
     },
     plugins: [

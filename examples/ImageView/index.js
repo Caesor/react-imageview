@@ -1,17 +1,41 @@
+/**********************************************************************************************
+ *  This component is designed for Tribe Project in QQ mobile as a Imageviewer
+ *  You can use it as a independent component in your App
+ *
+ *  @ examples  you can find examples in folder examples or README.md
+ *
+ *  @ param(string)       imagelist: The list of images to view
+ *  @ param(string/JSX)   content: The detail statement of purpose
+ *  @ param(string)       confirmText: The text in CONFIRM button
+ *  @ param(string)       cancelText: The text in CANCEL button
+ *  @ param(bool)         confirmAtRight: The CONFIRM is at the right of CANCEL button or not
+ *  @ param(bool)         useTap: Use Tap event as default, not Click
+ *  @ param(function)     callback: Events called after CONFIRM button is clicked
+ *  @ param(function)     cancelCallback: Events called after CANCEL button is clicked
+ *  @ param(function)     close: Use container's method to close the Alert
+ *
+ *  Copyright by nemoliao( liaozksysu@gmail.com), nemo is a member of AlloyTeam in Tencent.
+ *
+ **********************************************************************************************/
 import React, { Component } from 'react'
 import AlloyFinger from './libs/alloyfinger.js'
 import Transform from './libs/transform.js'
 import CenterImg from './CenterImg.js'
+import Singleton from 'react-singleton'
 
 import './index.less'
 
 const MARGIN = 40
 
-const ease = x => {
-    return Math.sqrt(1 - Math.pow(x - 1, 2));
-}
+class ImageView extends Component {
+    static propTypes = {
+        imagelist: React.PropTypes.array.isRequired,
+        disablePinch: React.PropTypes.bool,
+        disableRotate: React.PropTypes.bool,
+        disableDoubleTap: React.PropTypes.bool,
+        longTap: React.PropTypes.func
+    }
 
-export default class ImageView extends Component {
     constructor(props) {
         super();
     }
@@ -106,7 +130,6 @@ export default class ImageView extends Component {
         const { deltaX, deltaY } = evt;
 
         if(this.checkInArea(deltaX, deltaY)){
-            // console.log(this.ob.translateX, this.ob.translateY);
             this.ob.translateX += deltaX;
             this.ob.translateY += deltaY;
             this.focused = true;
@@ -116,7 +139,6 @@ export default class ImageView extends Component {
     }
 
     onSwipe(evt){
-        // console.log(evt.direction);
         const { direction, distance } = evt;
 
         let { current } = this.state;
@@ -156,24 +178,30 @@ export default class ImageView extends Component {
     }
 
     onMultipointStart(){
-        // console.log('multipointStart');
         this.endAnimation();
     }
 
     onPinch(evt){
+        if( this.props.disablePinch ){
+            return false;
+        }
         this.ob.scaleX = this.ob.scaleY = this.initScale * evt.scale;
         this.ob.style.webkitTransition = 'cubic-bezier(.15,.01,.88,1)'
     }
 
     onRotate(evt){
+        if( this.props.disableRotate ){
+            return false;
+        }
         this.ob.rotateZ += evt.angle;
         this.ob.style.webkitTransition = 'cubic-bezier(.15,.01,.88,1)'
     }
     
-    onLongTap(){}
+    onLongTap(){
+        this.props.longTap && this.props.longTap();
+    }
 
     onMultipointEnd(evt){
-        // console.log('multiponintEnd');
         // translate to normal
         this.changeIndex(this.state.current);
 
@@ -207,6 +235,9 @@ export default class ImageView extends Component {
     }
 
     onDoubleTap(evt){
+        if( this.props.disableDoubleTap ){
+            return false;
+        }
         
         const { origin } = evt,
             originX = origin[0] - this.screenWidth/2,
@@ -241,7 +272,10 @@ export default class ImageView extends Component {
     }
 
     restore() {
-        this.ob.style.webkitTransform = 'perspective(500px) matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)';
+        this.ob.translateX = this.ob.translateY = 0;
+        this.ob.rotateZ = 0;
+        this.setScale(1);
+        this.ob.originX = this.ob.originY = 0;
     }
 
     endAnimation() {
@@ -258,8 +292,6 @@ export default class ImageView extends Component {
                 rangeUp = (scaleX - 1) * this.screenHeight / 2 + originY,
                 rangeDown = -(scaleX - 1) * this.screenHeight / 2 + originY;
 
-            // console.log(rangeLeft, rangeRight, rangeUp, rangeDown);
-            
             if(translateX - originX + deltaX <= rangeLeft 
                 && translateX - originX + deltaX >= rangeRight 
                 && translateY - originY + deltaY <= rangeUp 
@@ -270,3 +302,7 @@ export default class ImageView extends Component {
         return false;
     }
 }
+
+export const SingleImgView = new Singleton(ImageView)
+ 
+export default ImageView

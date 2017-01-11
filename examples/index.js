@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { render } from 'react-dom'
-import ImageView from './ImageView'
+import ImageView from '../../dist/react-imageview.js'
 import Mlogger from '@tencent/mlogger'
 
 class Main extends Component {

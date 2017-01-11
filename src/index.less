@@ -1,0 +1,35 @@
+html, body, div, ul, li, a {
+    padding: 0;
+    margin: 0;
+}
+ul { list-style-type: none; }
+
+.imageview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 900;
+    background-color: #000;
+    overflow: hidden;
+}
+
+.imagelist {
+    display: -webkit-box;
+    display: box;
+    height: 100%;
+    .imagelist-item {
+        width: 100%;
+        text-align: center;
+        position: relative;
+        background-color: #000;
+        margin-right: 40px;
+
+        .imagelist-item-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    }
+}
