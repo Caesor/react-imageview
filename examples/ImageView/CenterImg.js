@@ -32,5 +32,6 @@ export default class CenterImg extends Component {
         }
 
         target.setAttribute('style', `width:${imgStyle.width}; height:${imgStyle.height}; left:${imgStyle.left}; top:${imgStyle.top};`);
+        target.setAttribute('rate', 1/r);
     }
 }

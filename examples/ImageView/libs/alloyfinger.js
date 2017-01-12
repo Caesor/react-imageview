@@ -1,8 +1,8 @@
  /* AlloyFinger v0.1.0
- * By dntzhang
- * Reedited by nemoliao
- * Github: https://github.com/AlloyTeam/AlloyFinger
- */
+  * By dntzhang
+  * Reedited by nemoliao
+  * Github: https://github.com/AlloyTeam/AlloyFinger
+  */
 
 import React, { Component } from 'react';
 
@@ -18,7 +18,7 @@ export default class AlloyFinger extends Component {
         this.last = null;
         this.now = null;
         this.end = null;
-        this.multiTouch = null;
+        this.multiTouch = false;
         this.tapTimeout = null;
         this.longTapTimeout = null;
         this.swipeTimeout=null;
@@ -186,7 +186,6 @@ export default class AlloyFinger extends Component {
     }
 
     _swipeDirection (x1, x2, y1, y2) {
-        // console.log('time:',this.end-this.now);
         if(Math.abs(x1 - x2) > 80 || this.end-this.now < 250){
             return Math.abs(x1 - x2) >= Math.abs(y1 - y2) ? (x1 - x2 > 0 ? 'Left' : 'Right') : (y1 - y2 > 0 ? 'Up' : 'Down')    
         }else {

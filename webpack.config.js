@@ -32,7 +32,7 @@ var config = {
     output: {
         path: 'dist/',
         library: 'react-imageview',
-        libraryTarget: 'umd'
+        libraryTarget: 'commonjs2'
     },
     plugins: [
         new webpack.optimize.DedupePlugin()

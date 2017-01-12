@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { render } from 'react-dom'
-import ImageView from './react-imageview.js'
+import ImageView from './ImageView'
 
-import '../dist/react-imageview.css'
+// import '../dist/react-imageview.css'
 
 import Mlogger from '@tencent/mlogger'
 

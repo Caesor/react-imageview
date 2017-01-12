@@ -4,15 +4,11 @@
  *
  *  @ examples  you can find examples in folder examples or README.md
  *
- *  @ param(string)       imagelist: The list of images to view
- *  @ param(string/JSX)   content: The detail statement of purpose
- *  @ param(string)       confirmText: The text in CONFIRM button
- *  @ param(string)       cancelText: The text in CANCEL button
- *  @ param(bool)         confirmAtRight: The CONFIRM is at the right of CANCEL button or not
- *  @ param(bool)         useTap: Use Tap event as default, not Click
- *  @ param(function)     callback: Events called after CONFIRM button is clicked
- *  @ param(function)     cancelCallback: Events called after CANCEL button is clicked
- *  @ param(function)     close: Use container's method to close the Alert
+ *  @ param(array)       imagelist: The list of images to view
+ *  @ param(bool)        disablePinch: Disable pinch function
+ *  @ param(bool)        disableRotate: Disable rotate function
+ *  @ param(bool)        disableDoubleTap: Disable double tap function
+ *  @ param(function)    longTap: Events called after the long tap
  *
  *  Copyright by nemoliao( liaozksysu@gmail.com), nemo is a member of AlloyTeam in Tencent.
  *
@@ -48,13 +44,11 @@ class ImageView extends Component {
     arrLength = 0;
     screenWidth = window.innerWidth;
     screenHeight = window.innerHeight;
-    list = {};
-    ob = {};
+    list = null;
+    ob = null;
     focused = null;
 
     render() {
-        const { imagelist } = this.props;
-
         return (
             <div className="imageview">
                 <AlloyFinger
@@ -62,7 +56,7 @@ class ImageView extends Component {
                     onSwipe={this.onSwipe.bind(this)}>
                     <ul id="imagelist" ref="imagelist" className="imagelist">
                     {
-                        imagelist.map((item, i) => {
+                        this.props.imagelist.map((item, i) => {
                             return (
                                 <li className="imagelist-item" key={"img"+i}>
                                     <AlloyFinger
@@ -91,20 +85,12 @@ class ImageView extends Component {
         this.ob = document.getElementById('view'+this.state.current);
 
         Transform(this.list);
+        Transform(this.ob);
         
-        for(let i = 0; i < this.arrLength; i++){
-            let pic = document.getElementById('view'+i);
-            Transform(pic);    
-        }
-
-        mqq.ui.setWebViewBehavior({
-            swipeBack: 0
-        });
-
-        mqq.invoke('ui', 'webviewCanScroll', {
-            enable: false
-        });
-
+        // for(let i = 0; i < this.arrLength; i++){
+        //     let pic = document.getElementById('view'+i);
+        //     Transform(pic);    
+        // }
     }
 
     onPressMove(evt){
@@ -118,7 +104,6 @@ class ImageView extends Component {
             }else{
                 this.list.translateX += evt.deltaX;    
             }
-
         }
         
         evt.preventDefault();
@@ -130,7 +115,6 @@ class ImageView extends Component {
         const { deltaX, deltaY } = evt;
 
         if(this.checkInArea(deltaX, deltaY)){
-            
             this.ob.translateX += deltaX;
             this.ob.translateY += deltaY;
             this.focused = true;
@@ -140,42 +124,21 @@ class ImageView extends Component {
     }
 
     onSwipe(evt){
-        const { direction, distance } = evt;
+        const { direction } = evt;
 
         let { current } = this.state;
         if( this.focused ){
             return false;
         }
-
-        if(direction === 'Left'){
-            if(current < this.arrLength-1) {
-                current++;
-
-                this.changeIndex(current);
-                this.setState({ current }, () => {
-                    this.restore();
-                    this.ob = document.getElementById('view'+current);
-                })
-                
-
-            }else {
-                this.changeIndex(current);
-            }
-        } else if( direction === 'Right') {
-            if( current > 0) {
-                current--;
-
-                this.changeIndex(current);
-                this.setState({ current }, () => {
-                    this.restore();
-                    this.ob = document.getElementById('view'+current);
-                })
-            }else {
-                this.changeIndex(current);
-            }
-        } else {
-            this.changeIndex(current)
+        switch(direction) {
+            case 'Left':
+                current < this.arrLength-1 && ++current && this.bindStyle(current);
+                break;
+            case 'Right':
+                current > 0 && --current && this.bindStyle(current);
+                break;
         }
+        this.changeIndex(current)
     }
 
     onMultipointStart(){
@@ -215,7 +178,8 @@ class ImageView extends Component {
         }
 
         // rotate to normal
-        let rotation = this.ob.rotateZ % 360;
+        let rotation = this.ob.rotateZ % 360,
+            rate = this.ob.getAttribute('rate');
 
         if(rotation < 0){
             rotation = 360 + rotation;
@@ -224,14 +188,19 @@ class ImageView extends Component {
 
         if (rotation > 0 && rotation < 45) {
             this.ob.rotateZ = 0;
+            this.setScale(1);
         } else if (rotation >= 315) {
             this.ob.rotateZ = 360;
+            this.setScale(1);
         } else if (rotation >= 45 && rotation < 135) {
             this.ob.rotateZ = 90;
+            this.setScale(rate);
         } else if (rotation >= 135 && rotation < 225) {
             this.ob.rotateZ = 180;
+            this.setScale(1);
         } else if (rotation >= 225 && rotation < 315) {
             this.ob.rotateZ = 270;
+            this.setScale(rate);
         }
     }
 
@@ -239,27 +208,28 @@ class ImageView extends Component {
         if( this.props.disableDoubleTap ){
             return false;
         }
-        
+
         const { origin } = evt,
             originX = origin[0] - this.screenWidth/2,
             originY = origin[1] - this.screenHeight/2;
 
         if(this.ob.scaleX === 1){
-
-            this.ob.originX = originX
-            this.ob.originY = originY;
-
-            // origin fixed
-            this.ob.translateX = originX;
-            this.ob.translateY = originY;
-
+            this.ob.translateX = this.ob.originX = originX
+            this.ob.translateY = this.ob.originY = originY;
             this.setScale(2);
         }else{
             this.ob.translateX = this.ob.originX;
             this.ob.translateY = this.ob.originY;
             this.setScale(1);
         }
-        this.checkInArea();
+    }
+
+    bindStyle(current) {
+        this.setState({ current }, () => {
+            this.restore();
+            this.ob = document.getElementById(`view${current}`);
+            if(!this.ob.scaleX){ Transform(this.ob) }
+        })
     }
 
     changeIndex(current) {
@@ -275,7 +245,7 @@ class ImageView extends Component {
     restore() {
         this.ob.translateX = this.ob.translateY = 0;
         this.ob.rotateZ = 0;
-        this.setScale(1);
+        this.ob.scaleX = this.ob.scaleY = 1;
         this.ob.originX = this.ob.originY = 0;
     }
 
@@ -285,10 +255,11 @@ class ImageView extends Component {
     }
 
     checkInArea(deltaX = 0, deltaY = 0) {
-        let { scaleX, translateX, translateY, originX, originY } = this.ob;
+        const { scaleX, translateX, translateY, originX, originY } = this.ob,
+            rate = this.ob.getAttribute('rate');
 
-        if(scaleX > 1){
-            let rangeLeft = (scaleX - 1) * this.screenWidth / 2 + originX,
+        if(scaleX !== 1 || scaleX !== rate){
+            const rangeLeft = (scaleX - 1) * this.screenWidth / 2 + originX,
                 rangeRight = -(scaleX - 1) * this.screenWidth / 2 + originX,
                 rangeUp = (scaleX - 1) * this.screenHeight / 2 + originY,
                 rangeDown = -(scaleX - 1) * this.screenHeight / 2 + originY;
