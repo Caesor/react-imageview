@@ -1,4 +1,4 @@
-# react-alert
+# react-imageview
 Imageview component built with react
 
 ## Demo
