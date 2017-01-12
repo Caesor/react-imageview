@@ -12,10 +12,10 @@ export default class CenterImg extends Component {
             h = target.naturalHeight,
             w = target.naturalWidth,
             r = h / w,
-            height = window.innerHeight,
-            width = window.innerWidth,
+            height = window.innerHeight || window.screen.availHeight,
+            width = window.innerWidth || window.screen.availWidth,
             rate = height / width;
-            
+
         let imgStyle = {};
 
         if(r > rate){

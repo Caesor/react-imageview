@@ -1,21 +1,18 @@
 import React, { Component } from 'react'
 import { render } from 'react-dom'
-import ImageView from './ImageView'
+import ImageView from 'react-imageview'
 
-// import '../dist/react-imageview.css'
-
-import Mlogger from '@tencent/mlogger'
+import 'react-imageview/dist/react-imageview.css'
 
 class Main extends Component {
     constructor(){
         super();
-        Mlogger.init({});
     }
 
     render() {
         const imagelist = [];
         for(let i = 0; i < 10; i++){
-            imagelist.push(`//8.url.cn/now/operation/img/${i+1}.jpg`);
+            imagelist.push(`./img/${i+1}.jpg`);
         }
 
         return (

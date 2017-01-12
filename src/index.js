@@ -42,8 +42,8 @@ class ImageView extends Component {
 
     initScale = 1;
     arrLength = 0;
-    screenWidth = window.innerWidth;
-    screenHeight = window.innerHeight;
+    screenWidth = window.innerWidth || window.screen.availWidth;
+    screenHeight = window.innerHeight || window.screen.availHeight;
     list = null;
     ob = null;
     focused = null;
@@ -86,10 +86,10 @@ class ImageView extends Component {
 
         Transform(this.list);
         Transform(this.ob);
-        
+
         // for(let i = 0; i < this.arrLength; i++){
         //     let pic = document.getElementById('view'+i);
-        //     Transform(pic);    
+        //     Transform(pic);
         // }
     }
 
@@ -100,12 +100,12 @@ class ImageView extends Component {
 
         if( !this.focused ){
             if((current === 0 && evt.deltaX > 0) || (current === this.arrLength - 1 && evt.deltaX < 0)){
-                this.list.translateX += evt.deltaX / 3;    
+                this.list.translateX += evt.deltaX / 3;
             }else{
-                this.list.translateX += evt.deltaX;    
+                this.list.translateX += evt.deltaX;
             }
         }
-        
+
         evt.preventDefault();
     }
 
@@ -160,7 +160,7 @@ class ImageView extends Component {
         this.ob.rotateZ += evt.angle;
         this.ob.style.webkitTransition = 'cubic-bezier(.15,.01,.88,1)'
     }
-    
+
     onLongTap(){
         this.props.longTap && this.props.longTap();
     }
@@ -264,9 +264,9 @@ class ImageView extends Component {
                 rangeUp = (scaleX - 1) * this.screenHeight / 2 + originY,
                 rangeDown = -(scaleX - 1) * this.screenHeight / 2 + originY;
 
-            if(translateX - originX + deltaX <= rangeLeft 
-                && translateX - originX + deltaX >= rangeRight 
-                && translateY - originY + deltaY <= rangeUp 
+            if(translateX - originX + deltaX <= rangeLeft
+                && translateX - originX + deltaX >= rangeRight
+                && translateY - originY + deltaY <= rangeUp
                 && translateY - originY + deltaY >= rangeDown ) {
                 return true;
             }
@@ -276,5 +276,5 @@ class ImageView extends Component {
 }
 
 export const SingleImgView = new Singleton(ImageView)
- 
+
 export default ImageView
