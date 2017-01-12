@@ -48,8 +48,8 @@ class ImageView extends Component {
     arrLength = 0;
     screenWidth = window.innerWidth;
     screenHeight = window.innerHeight;
-    list = null;
-    ob = null;
+    list = {};
+    ob = {};
     focused = null;
 
     render() {
@@ -87,7 +87,7 @@ class ImageView extends Component {
 
     componentDidMount() {
         this.arrLength = this.props.imagelist.length;
-        this.list = this.refs.imagelist;
+        this.list = this.refs['imagelist'];
         this.ob = document.getElementById('view'+this.state.current);
 
         Transform(this.list);
@@ -130,6 +130,7 @@ class ImageView extends Component {
         const { deltaX, deltaY } = evt;
 
         if(this.checkInArea(deltaX, deltaY)){
+            
             this.ob.translateX += deltaX;
             this.ob.translateY += deltaY;
             this.focused = true;

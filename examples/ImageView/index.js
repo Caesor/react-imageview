@@ -86,8 +86,9 @@ class ImageView extends Component {
     }
 
     componentDidMount() {
+        console.log(11);
         this.arrLength = this.props.imagelist.length;
-        this.list = this.refs.imagelist;
+        this.list = this.refs['imagelist'];
         this.ob = document.getElementById('view'+this.state.current);
 
         Transform(this.list);
