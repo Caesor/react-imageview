@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { render } from 'react-dom'
-// import ImageView from './src/index.js'
-import ImageView from 'react-imageview'
+import ImageView from './src/index.js'
+// import ImageView from 'react-imageview'
 
-import 'react-imageview/dist/react-imageview.css'
+// import 'react-imageview/dist/react-imageview.css'
 
 class Main extends Component {
     constructor(){

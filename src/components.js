@@ -9,14 +9,18 @@ export class CenterImage extends Component {
     render(){
         const { loading, error } = this.state;
 
-        return (
-            <div>
-                {
-                    error ? <Error /> : <img onLoad={this.onImgLoad.bind(this)} onError={this.onImgErr.bind(this)} {...this.props} />
-                }
-                { loading ? <Loading /> : null }
-            </div>
-        )
+        if(loading){ return <Loading /> }
+        if(error){ return <Error /> }
+
+        return <img onLoad={this.onImgLoad.bind(this)} onError={this.onImgErr.bind(this)} {...this.props} />
+    }
+
+    componentDidMount() {
+        let img = new Image();
+
+        img.src = this.props.src;
+        img.onload = this.onImgLoad.bind(this);
+        img.onerror = this.onImgErr.bind(this);
     }
 
     onImgLoad(e) {

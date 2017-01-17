@@ -9,6 +9,7 @@
  *  @ param(bool)        disableRotate: Disable rotate function
  *  @ param(bool)        disableDoubleTap: Disable double tap function
  *  @ param(function)    longTap: Events called after the long tap
+ *  @ param(function)    close: the function to close the viewer
  *
  *  Copyright by nemoliao( liaozksysu@gmail.com), nemo is a member of AlloyTeam in Tencent.
  *
@@ -29,7 +30,8 @@ class ImageView extends Component {
         disablePinch: React.PropTypes.bool,
         disableRotate: React.PropTypes.bool,
         disableDoubleTap: React.PropTypes.bool,
-        longTap: React.PropTypes.func
+        longTap: React.PropTypes.func,
+        close: React.PropTypes.func
     }
 
     constructor(props) {
@@ -52,6 +54,7 @@ class ImageView extends Component {
         return (
             <div className="imageview">
                 <AlloyFinger
+                    onTap={this.onTap.bind(this)}
                     onPressMove={this.onPressMove.bind(this)}
                     onSwipe={this.onSwipe.bind(this)}>
                     <ul id="imagelist" ref="imagelist" className="imagelist">
@@ -89,6 +92,11 @@ class ImageView extends Component {
         Transform(this.ob);
     }
 
+    onTap(){
+        console.log('tap');
+        this.props.close && this.props.close();
+    }
+
     onPressMove(evt){
         const { current } = this.state;
 
@@ -110,7 +118,7 @@ class ImageView extends Component {
 
         const { deltaX, deltaY } = evt;
 
-        if(this.checkInArea(deltaX, deltaY)){
+        if(this.ob && this.checkInArea(deltaX, deltaY)){
             this.ob.translateX += deltaX;
             this.ob.translateY += deltaY;
             this.focused = true;
@@ -164,6 +172,10 @@ class ImageView extends Component {
     onMultipointEnd(evt){
         // translate to normal
         this.changeIndex(this.state.current);
+
+        if(!this.ob){
+            return;
+        }
 
         // scale to normal
         if (this.ob.scaleX < 1) {
