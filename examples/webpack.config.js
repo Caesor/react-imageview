@@ -18,6 +18,10 @@ module.exports = {
             loaders: ['style', 'css', 'less']
         },
         {
+            test: /\.(png|jpg|gif|woff|woff2)$/,
+            loader: 'url-loader?limit=8192'
+        },
+        {
             test: /\.(js|jsx)$/,
             loaders: ['babel'],
             // exclude: /node_modules/,
@@ -26,10 +30,10 @@ module.exports = {
         ]
     },
     plugins: [
-        new webpack.optimize.UglifyJsPlugin({
-            compress: {
-                warnings: false
-            }
-        }),
+        // new webpack.optimize.UglifyJsPlugin({
+        //     compress: {
+        //         warnings: false
+        //     }
+        // }),
     ]
 }
