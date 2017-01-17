@@ -43,6 +43,7 @@ class Main extends Component {
 // Example 2:
 
 import { SingleImgView } from 'react-imageview'
+import 'react-imageview/dist/react-imageview.min.css'
 
 // You can call SingleImgView.show anywhere and anytime, there will be only one View DOM node be added.
 
