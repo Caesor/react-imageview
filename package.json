@@ -1,6 +1,10 @@
 {
   "name": "react-imageview",
+<<<<<<< HEAD
+  "version": "1.0.2",
+=======
   "version": "1.0.1",
+>>>>>>> master
   "description": "A image viewer built with react",
   "main": "dist/react-imageview.js",
   "scripts": {
@@ -41,6 +45,10 @@
     "less": "^2.7.1",
     "less-loader": "^2.2.3",
     "style-loader": "^0.13.1",
+<<<<<<< HEAD
+    "url-loader": "^0.5.7",
+=======
+>>>>>>> master
     "webpack": "^1.14.0"
   }
 }
