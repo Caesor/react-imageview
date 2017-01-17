@@ -87,11 +87,6 @@ class ImageView extends Component {
 
         Transform(this.list);
         Transform(this.ob);
-
-        // for(let i = 0; i < this.arrLength; i++){
-        //     let pic = document.getElementById('view'+i);
-        //     Transform(pic);
-        // }
     }
 
     onPressMove(evt){
