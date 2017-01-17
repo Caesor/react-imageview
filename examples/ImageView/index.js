@@ -16,11 +16,7 @@
 import React, { Component } from 'react'
 import AlloyFinger from './libs/alloyfinger.js'
 import Transform from './libs/transform.js'
-<<<<<<< HEAD
-import { CenterImage } from './components.js'
-=======
 import CenterImg from './CenterImg.js'
->>>>>>> master
 import Singleton from 'react-singleton'
 
 import './index.less'
@@ -38,10 +34,6 @@ class ImageView extends Component {
 
     constructor(props) {
         super();
-<<<<<<< HEAD
-        this.arrLength = props.imagelist.length;
-=======
->>>>>>> master
     }
 
     state = {
@@ -49,12 +41,9 @@ class ImageView extends Component {
     }
 
     initScale = 1;
-<<<<<<< HEAD
-=======
     arrLength = 0;
->>>>>>> master
-    screenWidth = window.innerWidth || window.screen.availWidth;
-    screenHeight = window.innerHeight || window.screen.availHeight;
+    screenWidth = window.innerWidth;
+    screenHeight = window.innerHeight;
     list = null;
     ob = null;
     focused = null;
@@ -78,11 +67,7 @@ class ImageView extends Component {
                                         onRotate={this.onRotate.bind(this)}
                                         onMultipointEnd={this.onMultipointEnd.bind(this)}
                                         onDoubleTap={this.onDoubleTap.bind(this)}>
-<<<<<<< HEAD
-                                        <CenterImage id={`view${i}`} className="imagelist-item-img" src={item} />
-=======
                                         <CenterImg id={`view${i}`} className="imagelist-item-img" src={item} />
->>>>>>> master
                                     </AlloyFinger>
                                 </li>
                             )
@@ -90,10 +75,6 @@ class ImageView extends Component {
                     }
                     </ul>
                 </AlloyFinger>
-<<<<<<< HEAD
-                <div className="page">{ this.state.current + 1 } / { this.arrLength }</div>
-=======
->>>>>>> master
             </div>
         )
     }
@@ -105,10 +86,10 @@ class ImageView extends Component {
 
         Transform(this.list);
         Transform(this.ob);
-
+        
         // for(let i = 0; i < this.arrLength; i++){
         //     let pic = document.getElementById('view'+i);
-        //     Transform(pic);
+        //     Transform(pic);    
         // }
     }
 
@@ -119,12 +100,12 @@ class ImageView extends Component {
 
         if( !this.focused ){
             if((current === 0 && evt.deltaX > 0) || (current === this.arrLength - 1 && evt.deltaX < 0)){
-                this.list.translateX += evt.deltaX / 3;
+                this.list.translateX += evt.deltaX / 3;    
             }else{
-                this.list.translateX += evt.deltaX;
+                this.list.translateX += evt.deltaX;    
             }
         }
-
+        
         evt.preventDefault();
     }
 
@@ -154,11 +135,7 @@ class ImageView extends Component {
                 current < this.arrLength-1 && ++current && this.bindStyle(current);
                 break;
             case 'Right':
-<<<<<<< HEAD
-                current > 0 && current-- && this.bindStyle(current);
-=======
                 current > 0 && --current && this.bindStyle(current);
->>>>>>> master
                 break;
         }
         this.changeIndex(current)
@@ -183,7 +160,7 @@ class ImageView extends Component {
         this.ob.rotateZ += evt.angle;
         this.ob.style.webkitTransition = 'cubic-bezier(.15,.01,.88,1)'
     }
-
+    
     onLongTap(){
         this.props.longTap && this.props.longTap();
     }
@@ -249,15 +226,9 @@ class ImageView extends Component {
 
     bindStyle(current) {
         this.setState({ current }, () => {
-<<<<<<< HEAD
-            this.ob && this.restore();
-            this.ob = document.getElementById(`view${current}`);
-            if(this.ob && !this.ob.scaleX){ Transform(this.ob) }
-=======
             this.restore();
             this.ob = document.getElementById(`view${current}`);
             if(!this.ob.scaleX){ Transform(this.ob) }
->>>>>>> master
         })
     }
 
@@ -280,11 +251,7 @@ class ImageView extends Component {
 
     endAnimation() {
         this.list.style.webkitTransition = '0';
-<<<<<<< HEAD
-        this.ob && this.ob.style && (this.ob.style.webkitTransition = '0');
-=======
         this.ob.style.webkitTransition = '0';
->>>>>>> master
     }
 
     checkInArea(deltaX = 0, deltaY = 0) {
@@ -297,9 +264,9 @@ class ImageView extends Component {
                 rangeUp = (scaleX - 1) * this.screenHeight / 2 + originY,
                 rangeDown = -(scaleX - 1) * this.screenHeight / 2 + originY;
 
-            if(translateX - originX + deltaX <= rangeLeft
-                && translateX - originX + deltaX >= rangeRight
-                && translateY - originY + deltaY <= rangeUp
+            if(translateX - originX + deltaX <= rangeLeft 
+                && translateX - originX + deltaX >= rangeRight 
+                && translateY - originY + deltaY <= rangeUp 
                 && translateY - originY + deltaY >= rangeDown ) {
                 return true;
             }
@@ -309,5 +276,5 @@ class ImageView extends Component {
 }
 
 export const SingleImgView = new Singleton(ImageView)
-
+ 
 export default ImageView

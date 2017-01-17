@@ -1,3 +1,8 @@
 .DS_Store
 node_modules
+<<<<<<< HEAD
+=======
+examples/dist
+dist
+>>>>>>> master
 npm-debug.log
