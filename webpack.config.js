@@ -22,13 +22,10 @@ var config = {
                 loader: ExtractTextPlugin.extract("style-loader", "css-loader!less-loader")
             },
             {
-<<<<<<< HEAD
                 test: /\.(png|jpg|gif|woff|woff2)$/,
                 loader: 'url-loader?limit=8192'
             },
             {
-=======
->>>>>>> master
                 test: /\.jsx?$/,
                 loader: 'babel',
                 exclude: /node_modules/,
