@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 
+const PRELOADNUM = 3;
+
 export class CenterImage extends Component {
     state = {
         loading: true,
@@ -7,23 +9,46 @@ export class CenterImage extends Component {
     }
 
     render(){
-        const { loading, error } = this.state;
+        const { loading, error } = this.state,
+            { className, id, lazysrc } = this.props;
 
         if(loading){ return <Loading /> }
         if(error){ return <Error /> }
 
-        return <img onLoad={this.onImgLoad.bind(this)} onError={this.onImgErr.bind(this)} {...this.props} />
+        return <img onLoad={this.onImgLoad.bind(this)} className={className} id={id} src={lazysrc}/>
     }
 
-    componentDidMount() {
-        let img = new Image();
+    componentWillMount() {
+        this.loadImg();
+    }
 
-        img.src = this.props.src;
-        img.onload = this.onImgLoad.bind(this);
-        img.onerror = this.onImgErr.bind(this);
+    componentWillReceiveProps(nextProps){
+        this.loadImg();
+    }
+
+    loadImg() {
+        const { index, current, lazysrc } = this.props;
+
+        if( lazysrc && index <= current + PRELOADNUM && index >= current - PRELOADNUM ){
+            let img = new Image();
+
+            img.src = lazysrc;
+            img.onload = () => {
+                this.setState({
+                    loading: false
+                })
+            };
+            img.onerror = () => {
+                this.setState({
+                    loading: false,
+                    error: true
+                })
+            };
+        }
     }
 
     onImgLoad(e) {
+
         const target = e.target,
             h = target.naturalHeight,
             w = target.naturalWidth,
@@ -47,19 +72,8 @@ export class CenterImage extends Component {
             imgStyle.height = height;
         }
 
-        this.setState({
-            loading: false
-        })
-
         target.setAttribute('style', `width:${imgStyle.width}; height:${imgStyle.height}; left:${imgStyle.left}; top:${imgStyle.top};`);
         target.setAttribute('rate', 1/r);
-    }
-
-    onImgErr(e) {
-        this.setState({
-            loading: false,
-            error: true
-        })
     }
 }
 

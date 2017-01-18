@@ -70,7 +70,7 @@ class ImageView extends Component {
                                         onRotate={this.onRotate.bind(this)}
                                         onMultipointEnd={this.onMultipointEnd.bind(this)}
                                         onDoubleTap={this.onDoubleTap.bind(this)}>
-                                        <CenterImage id={`view${i}`} className="imagelist-item-img" src={item} />
+                                        <CenterImage id={`view${i}`} className="imagelist-item-img" lazysrc={item} index={i} current={this.state.current}/>
                                     </AlloyFinger>
                                 </li>
                             )
@@ -89,7 +89,7 @@ class ImageView extends Component {
         this.ob = document.getElementById('view'+this.state.current);
 
         Transform(this.list);
-        Transform(this.ob);
+        this.ob && Transform(this.ob);
     }
 
     onTap(){
