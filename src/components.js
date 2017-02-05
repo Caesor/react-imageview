@@ -10,12 +10,12 @@ export class CenterImage extends Component {
 
     render(){
         const { loading, error } = this.state,
-            { className, id, lazysrc } = this.props;
+            { index, current, lazysrc, ...childProps } = this.props;
 
         if(loading){ return <Loading /> }
         if(error){ return <Error /> }
 
-        return <img onLoad={this.onImgLoad.bind(this)} className={className} id={id} src={lazysrc}/>
+        return <img onLoad={this.onImgLoad.bind(this)} src={lazysrc} {...childProps} />
     }
 
     componentWillMount() {
