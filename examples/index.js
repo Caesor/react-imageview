@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { render } from 'react-dom'
-import ImageView from './src/index.js'
+import { SingleImgView } from './src/index.js'
 // import ImageView from 'react-imageview'
 
 // import 'react-imageview/dist/react-imageview.css'
@@ -25,9 +25,22 @@ class Main extends Component {
 
         return (
             <div>
-                <ImageView imagelist={imagelist} />
+                <h3 className="title">Click image to open the viewer.</h3>
+                <ul className="gallery">
+                { imagelist.map((item, i)=>{
+                    return (<li key={i}><img className="pic" src={item} onClick={this.show.bind(this, imagelist, i)}/></li>)
+                })}
+                </ul>  
             </div>
         )
+    }
+
+    show(imagelist, current){
+        SingleImgView.show({
+            imagelist,
+            current,
+            close: ()=>{SingleImgView.hide()}
+        })
     }
 }
 

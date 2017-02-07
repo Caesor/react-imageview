@@ -25,22 +25,28 @@ import './index.less'
 const MARGIN = 40
 
 class ImageView extends Component {
+    static defaultProps = {
+        current: 0,
+        disablePageNum: false
+    }
+
     static propTypes = {
+        current: React.PropTypes.number,
         imagelist: React.PropTypes.array.isRequired,
+        disablePageNum: React.PropTypes.bool,
         disablePinch: React.PropTypes.bool,
         disableRotate: React.PropTypes.bool,
         disableDoubleTap: React.PropTypes.bool,
         longTap: React.PropTypes.func,
-        close: React.PropTypes.func
+        close: React.PropTypes.func.isRequired
     }
 
     constructor(props) {
         super();
         this.arrLength = props.imagelist.length;
-    }
-
-    state = {
-        current: 0
+        this.state = {
+            current: props.current
+        }
     }
 
     initScale = 1;
@@ -78,22 +84,26 @@ class ImageView extends Component {
                     }
                     </ul>
                 </AlloyFinger>
-                <div className="page">{ this.state.current + 1 } / { this.arrLength }</div>
+                {
+                    this.props.disablePageNum ? null : <div className="page">{ this.state.current + 1 } / { this.arrLength }</div>
+                }
             </div>
         )
     }
 
     componentDidMount() {
+        const { current } = this.state;
+
         this.arrLength = this.props.imagelist.length;
         this.list = this.refs['imagelist'];
-        this.ob = document.getElementById('view'+this.state.current);
+        this.ob = document.getElementById('view'+current);
 
         Transform(this.list);
+        current && this.changeIndex(current, false);
         this.ob && Transform(this.ob);
     }
 
     onSingleTap(){
-        console.log('tap');
         this.props.close && this.props.close();
     }
 
@@ -218,8 +228,8 @@ class ImageView extends Component {
         }
 
         const { origin } = evt,
-            originX = origin[0] - this.screenWidth/2,
-            originY = origin[1] - this.screenHeight/2;
+            originX = origin[0] - this.screenWidth/2 - document.body.scrollLeft,
+            originY = origin[1] - this.screenHeight/2 - document.body.scrollTop;
 
         if(this.ob.scaleX === 1){
             this.ob.translateX = this.ob.originX = originX
@@ -240,8 +250,8 @@ class ImageView extends Component {
         })
     }
 
-    changeIndex(current) {
-        this.list.style.webkitTransition = '300ms ease';
+    changeIndex(current, ease=true) {
+        ease && (this.list.style.webkitTransition = '300ms ease');
         this.list.translateX = -current*(this.screenWidth + MARGIN);
     }
 

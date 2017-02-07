@@ -59,8 +59,8 @@ export class CenterImage extends Component {
             h = target.naturalHeight,
             w = target.naturalWidth,
             r = h / w,
-            height = document.body.clientHeight || window.innerHeight || window.screen.availHeight,
-            width = document.body.clientWidth || window.innerWidth || window.screen.availWidth,
+            height = window.innerHeight || window.screen.availHeight,
+            width = window.innerWidth || window.screen.availWidth,
             rate = height / width;
 
         let imgStyle = {};
