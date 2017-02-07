@@ -1,6 +1,6 @@
 {
   "name": "react-imageview",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "A image viewer built with react",
   "main": "dist/react-imageview.js",
   "scripts": {
