@@ -5,17 +5,21 @@ const PRELOADNUM = 3;
 export class CenterImage extends Component {
     state = {
         loading: true,
-        error: false
+        error: false,
+        loaded: false
     }
 
     render(){
         const { loading, error } = this.state,
-            { index, current, lazysrc, ...childProps } = this.props;
+            { index, current, lazysrc, ...childProps } = this.props,
+            img = (<img onLoad={this.onImgLoad.bind(this)} src={lazysrc} {...childProps} />);
 
+        // init first image, others have been preloaded
+        if( index === current ){ return img }
         if(loading){ return <Loading /> }
         if(error){ return <Error /> }
 
-        return <img onLoad={this.onImgLoad.bind(this)} src={lazysrc} {...childProps} />
+        return img;
     }
 
     componentWillMount() {
@@ -23,7 +27,7 @@ export class CenterImage extends Component {
     }
 
     componentWillReceiveProps(nextProps){
-        this.loadImg();
+        !this.state.loaded && this.loadImg();
     }
 
     loadImg() {
@@ -48,6 +52,8 @@ export class CenterImage extends Component {
     }
 
     onImgLoad(e) {
+
+        this.setState({ loaded: true });
 
         const target = e.target,
             h = target.naturalHeight,
