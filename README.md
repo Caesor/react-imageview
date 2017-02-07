@@ -1,4 +1,4 @@
-## English | [中文](#user-content-中文--english-1)
+## English | [中文](#user-content-中文--english)
 
 ## react-imageview
 Imageview component built with react
@@ -73,7 +73,7 @@ Copyright(c) 2016-2017 AlloyTeam. Licensed under MIT license.
 
 
 
-## 中文 | [English](#user-content-中文--english)
+## 中文 | [English](#user-content-english--中文)
 
 ## React图片查看器
 使用React打造的图片查看器
