@@ -54,7 +54,7 @@ class ImageView extends Component {
         return (
             <div className="imageview">
                 <AlloyFinger
-                    onTap={this.onTap.bind(this)}
+                    onSingleTap={this.onSingleTap.bind(this)}
                     onPressMove={this.onPressMove.bind(this)}
                     onSwipe={this.onSwipe.bind(this)}>
                     <ul id="imagelist" ref="imagelist" className="imagelist">
@@ -92,7 +92,7 @@ class ImageView extends Component {
         this.ob && Transform(this.ob);
     }
 
-    onTap(){
+    onSingleTap(){
         console.log('tap');
         this.props.close && this.props.close();
     }

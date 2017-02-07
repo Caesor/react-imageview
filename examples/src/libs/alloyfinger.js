@@ -21,6 +21,7 @@ export default class AlloyFinger extends Component {
         this.multiTouch = false;
         this.tapTimeout = null;
         this.longTapTimeout = null;
+        this.singleTapTimeout = null;
         this.swipeTimeout=null;
         this.x1 = this.x2 = this.y1 = this.y2 = null;
         this.preTapPosition={x:null,y:null};
@@ -73,7 +74,7 @@ export default class AlloyFinger extends Component {
 
     _handleTouchStart (evt) {
 
-
+        if(!evt.touches) return;
        this.now = Date.now();
        this.x1 = evt.touches[0].pageX;
        this.y1 = evt.touches[0].pageY;
@@ -88,6 +89,8 @@ export default class AlloyFinger extends Component {
            len = evt.touches.length;
 
        if (len > 1) {
+            this._cancelLongTap();
+            this._cancelSingleTap();
            var v = { x: evt.touches[1].pageX - this.x1, y: evt.touches[1].pageY - this.y1 };
            preV.x = v.x;
            preV.y = v.y;
@@ -138,6 +141,7 @@ export default class AlloyFinger extends Component {
     }
 
     _handleTouchCancel(){
+        clearInterval(this.singleTapTimeout);
         clearInterval(this.tapTimeout);
         clearInterval(this.longTapTimeout);
         clearInterval(this.swipeTimeout);
@@ -165,9 +169,13 @@ export default class AlloyFinger extends Component {
                 this.tapTimeout = setTimeout(() => {
                     this._emitEvent('onTap', evt);
                     if (this.isDoubleTap) {
-                        // debugger
                         this._emitEvent('onDoubleTap', evt);
+                        clearTimeout(this.singleTapTimeout);
                         this.isDoubleTap = false;
+                    } else {
+                        this.singleTapTimeout = setTimeout(()=>{
+                            this._emitEvent('onSingleTap', evt);
+                        }, 250);
                     }
                 }, 0)
             }
@@ -183,6 +191,10 @@ export default class AlloyFinger extends Component {
 
     _cancelLongTap () {
         clearTimeout(this.longTapTimeout);
+    }
+
+    _cancelSingleTap () {
+        clearTimeout(this.singleTapTimeout);
     }
 
     _swipeDirection (x1, x2, y1, y2) {
