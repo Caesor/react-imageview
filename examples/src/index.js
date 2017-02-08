@@ -156,7 +156,8 @@ class ImageView extends Component {
     }
 
     onMultipointStart(){
-        this.endAnimation();
+        // this.endAnimation();
+        this.initScale = this.ob.scaleX;
     }
 
     onPinch(evt){
@@ -206,16 +207,13 @@ class ImageView extends Component {
 
         if (rotation > 0 && rotation < 45) {
             this.ob.rotateZ = 0;
-            this.setScale(1);
         } else if (rotation >= 315) {
             this.ob.rotateZ = 360;
-            this.setScale(1);
         } else if (rotation >= 45 && rotation < 135) {
             this.ob.rotateZ = 90;
             this.setScale(rate);
         } else if (rotation >= 135 && rotation < 225) {
             this.ob.rotateZ = 180;
-            this.setScale(1);
         } else if (rotation >= 225 && rotation < 315) {
             this.ob.rotateZ = 270;
             this.setScale(rate);
