@@ -1,10 +1,19 @@
 ## 中文 | [English](#user-content-english--中文)
 
 ## React图片查看器
-使用React打造的图片查看器
+使用React打造的H5图片查看器
+
+## 特性
+* 各类手势快速响应
+* 急速滑动翻页
+* 支持双指缩放、旋转、双击放大
+* 支持放大后局部拖拽、翻页
+* 支持超长(纵向)拼接图查看
+* 支持下载
+* 图片懒加载、预加载
 
 ## 示例
-您可以在[这里](https://github.com/Caesor/react-imageview/examples)找到例子或者[在线示例](https://caesor.github.io/react-imageview/examples/)
+您可以下载代码在examples文件夹中找到例子或者[在线示例](https://alloyteam.github.io/AlloyViewer/examples/)
 
 ## 使用方法
 
@@ -58,15 +67,20 @@ SingleImgView.show({
 ```
 
 ## 配置说明
-| 参数     | 类型     | 描述 | 必需 |
-| :------------- | :------------- | :------------- | :------------- |
-| imagelist         | array      | 要预览的图片列表 | 是 |
-| current         | number      | 当前展示的图片序号（从0开始） | 否(默认0) |
-| close         | function      | 图片查看器关闭方法 | 是 |
-| disablePinch      | bool       | 禁用缩小放大 | 否 |
-| disableRotate     | bool       | 禁用旋转 | 否 |
-| disableDoubleTap  | bool       | 禁用双击放大 | 否 |
-| longTap           | function   | 长按回调 | 否 |
+| 参数     | 类型     | 描述 | 必需 | 默认值 |
+| :------------- | :------------- | :------------- | :------------- | :------------- |
+| imagelist         | array      | 要预览的图片列表 | 是 | 无 |
+| current         | number      | 当前展示的图片序号（从0开始） | 否 | 0 |
+| close         | function      | 图片查看器关闭方法 | 是 | |
+| gap         | number      | 轮播图间距 | 否 | 30 |
+| maxScale         | number      | 最大缩放倍数 | 否 | 2 |
+| disablePinch      | bool       | 禁用缩小放大 | 否 | false |
+| enableRotate     | bool       | 启用旋转 | 否(默认关闭) | false |
+| disableDoubleTap  | bool       | 禁用双击放大 | 否 | false |
+| initCallback           | function   | 初始化后回调 | 否 | |
+| longTap           | function   | 长按回调 | 否 | |
+| changeIndex           | function   | 轮播后回调 | 否 | |
+
 
 
 ## English | [中文](#user-content-中文--english)
@@ -75,7 +89,7 @@ SingleImgView.show({
 Imageview component built with react
 
 ## Demo
-You can find demo in [folder](https://github.com/Caesor/react-imageview/examples) or [demo online](https://caesor.github.io/react-imageview/examples/)
+You can download the code and find demo in folder which is named as examples or [demo online](https://alloyteam.github.io/AlloyViewer/examples/)
 
 ## Usage with React
 

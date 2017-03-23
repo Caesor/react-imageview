@@ -22,23 +22,30 @@ import Singleton from 'react-singleton'
 
 import './index.less'
 
-const MARGIN = 40
+const MARGIN = 30
 
 class ImageView extends Component {
     static defaultProps = {
+        gap: MARGIN,
         current: 0,
-        disablePageNum: false
+        disablePageNum: false,
+        desc: '',
+        maxScale: 2
     }
 
     static propTypes = {
+        gap: React.PropTypes.number,
+        maxScale: React.PropTypes.number,
         current: React.PropTypes.number,
         imagelist: React.PropTypes.array.isRequired,
         disablePageNum: React.PropTypes.bool,
         disablePinch: React.PropTypes.bool,
-        disableRotate: React.PropTypes.bool,
+        enableRotate: React.PropTypes.bool,
         disableDoubleTap: React.PropTypes.bool,
         longTap: React.PropTypes.func,
-        close: React.PropTypes.func.isRequired
+        close: React.PropTypes.func.isRequired,
+        changeIndex: React.PropTypes.func,
+        initCallback: React.PropTypes.func
     }
 
     constructor(props) {
@@ -57,17 +64,19 @@ class ImageView extends Component {
     focused = null;
 
     render() {
+        const { desc, disablePageNum, children, gap } = this.props;
+
         return (
             <div className="imageview">
                 <AlloyFinger
                     onSingleTap={this.onSingleTap.bind(this)}
                     onPressMove={this.onPressMove.bind(this)}
                     onSwipe={this.onSwipe.bind(this)}>
-                    <ul id="imagelist" ref="imagelist" className="imagelist">
+                    <ul ref="imagelist" className="imagelist">
                     {
                         this.props.imagelist.map((item, i) => {
                             return (
-                                <li className="imagelist-item" key={"img"+i}>
+                                <li className="imagelist-item" style={{ marginRight: gap + 'px'}} key={"img"+i}>
                                     <AlloyFinger
                                         onPressMove={this.onPicPressMove.bind(this)}
                                         onMultipointStart={this.onMultipointStart.bind(this)}
@@ -85,22 +94,30 @@ class ImageView extends Component {
                     </ul>
                 </AlloyFinger>
                 {
-                    this.props.disablePageNum ? null : <div className="page">{ this.state.current + 1 } / { this.arrLength }</div>
+                    disablePageNum ? null : <div className="page" ref="page">{ this.state.current + 1 } / { this.arrLength }</div>
                 }
+                {
+                    desc ? <div dangerouslySetInnerHTML={{__html: desc}}></div> : null
+                }
+                { children }
             </div>
         )
     }
 
     componentDidMount() {
-        const { current } = this.state;
+        const { current } = this.state,
+            { imagelist, initCallback } = this.props;
 
-        this.arrLength = this.props.imagelist.length;
+        this.arrLength = imagelist.length;
         this.list = this.refs['imagelist'];
-        this.ob = document.getElementById('view'+current);
-
+        
         Transform(this.list);
+
         current && this.changeIndex(current, false);
-        this.ob && Transform(this.ob);
+
+        this.bindStyle(current);
+
+        initCallback && initCallback();
     }
 
     onSingleTap(){
@@ -123,20 +140,6 @@ class ImageView extends Component {
         evt.preventDefault();
     }
 
-    onPicPressMove(evt) {
-        this.endAnimation();
-
-        const { deltaX, deltaY } = evt;
-
-        if(this.ob && this.checkInArea(deltaX, deltaY)){
-            this.ob.translateX += deltaX;
-            this.ob.translateY += deltaY;
-            this.focused = true;
-        }else {
-            this.focused = false;
-        }
-    }
-
     onSwipe(evt){
         const { direction } = evt;
 
@@ -155,25 +158,60 @@ class ImageView extends Component {
         this.changeIndex(current)
     }
 
+    onPicPressMove(evt) {
+        const { deltaX, deltaY } = evt,
+            isLongPic = this.ob.getAttribute('long'),
+            { scaleX, width } = this.ob;
+
+        if(this.ob.scaleX <= 1 || evt.touches.length > 1){
+            return;
+        }
+
+        if(this.ob && this.checkBoundary(deltaX, deltaY)){
+            !isLongPic && (this.ob.translateX += deltaX);
+            this.ob.translateY += deltaY;
+            
+            if(isLongPic && scaleX * width === this.screenWidth){
+                this.focused = false;
+            }else{
+                this.focused = true;    
+            }
+        }else {
+            this.focused = false;
+        }
+        // console.log('translate ',this.ob.translateX, this.ob.translateY);
+    }
+
     onMultipointStart(){
-        // this.endAnimation();
         this.initScale = this.ob.scaleX;
     }
 
     onPinch(evt){
-        if( this.props.disablePinch ){
+        if( this.props.disablePinch || this.ob.getAttribute('long')){
             return false;
         }
+        this.ob.style.webkitTransition = 'cubic-bezier(.25,.01,.25,1)'
+
+        const { originX, originY } = this.ob, 
+            originX2 = evt.center.x - this.screenWidth/2 - document.body.scrollLeft,
+            originY2 = evt.center.y - this.screenHeight/2 - document.body.scrollTop;
+
+        this.ob.originX = originX2;
+        this.ob.originY = originY2;
+        this.ob.translateX = this.ob.translateX + (originX2 - originX) * this.ob.scaleX;
+        this.ob.translateY = this.ob.translateY + (originY2 - originY) * this.ob.scaleY;
+
         this.ob.scaleX = this.ob.scaleY = this.initScale * evt.scale;
-        this.ob.style.webkitTransition = 'cubic-bezier(.15,.01,.88,1)'
     }
 
     onRotate(evt){
-        if( this.props.disableRotate ){
+        if( !this.props.enableRotate || this.ob.getAttribute('rate') >= 3.5){
             return false;
         }
+        
+        this.ob.style.webkitTransition = 'cubic-bezier(.25,.01,.25,1)'
+
         this.ob.rotateZ += evt.angle;
-        this.ob.style.webkitTransition = 'cubic-bezier(.15,.01,.88,1)'
     }
 
     onLongTap(){
@@ -188,12 +226,16 @@ class ImageView extends Component {
             return;
         }
 
+        this.ob.style.webkitTransition = '300ms ease';
+
+        const { maxScale } = this.props,
+            isLongPic = this.ob.getAttribute('long');
         // scale to normal
         if (this.ob.scaleX < 1) {
-            this.setScale(1);
+            this.restore(false);
         }
-        if (this.ob.scaleX > 2) {
-            this.setScale(2);
+        if (this.ob.scaleX > maxScale && !isLongPic){
+            this.setScale(maxScale);
         }
 
         // rotate to normal
@@ -227,30 +269,45 @@ class ImageView extends Component {
 
         const { origin } = evt,
             originX = origin[0] - this.screenWidth/2 - document.body.scrollLeft,
-            originY = origin[1] - this.screenHeight/2 - document.body.scrollTop;
+            originY = origin[1] - this.screenHeight/2 - document.body.scrollTop,
+            isLongPic = this.ob.getAttribute('long');
 
         if(this.ob.scaleX === 1){
-            this.ob.translateX = this.ob.originX = originX
-            this.ob.translateY = this.ob.originY = originY;
-            this.setScale(2);
+            !isLongPic && (this.ob.translateX = this.ob.originX = originX);
+            !isLongPic && (this.ob.translateY = this.ob.originY = originY);
+            this.setScale(isLongPic ? this.screenWidth / this.ob.width : this.props.maxScale);
         }else{
             this.ob.translateX = this.ob.originX;
             this.ob.translateY = this.ob.originY;
             this.setScale(1);
-        }
+        }   
+    
+        // console.log('origin',this.ob.originX, this.ob.originY);
     }
 
     bindStyle(current) {
         this.setState({ current }, () => {
             this.ob && this.restore();
             this.ob = document.getElementById(`view${current}`);
-            if(this.ob && !this.ob.scaleX){ Transform(this.ob) }
+            if(this.ob && !this.ob.scaleX){ 
+                Transform(this.ob)
+            }
+            // ease hide page number
+            const page = this.refs.page;
+            if(page){
+                page.classList.remove('hide');
+                setTimeout(()=>{
+                    page.classList.add('hide');
+                }, 2000);
+            }
         })
     }
 
     changeIndex(current, ease=true) {
         ease && (this.list.style.webkitTransition = '300ms ease');
-        this.list.translateX = -current*(this.screenWidth + MARGIN);
+        this.list.translateX = -current*(this.screenWidth + this.props.gap);
+
+        this.props.changeIndex && this.props.changeIndex(current);
     }
 
     setScale(size) {
@@ -258,9 +315,9 @@ class ImageView extends Component {
         this.ob.scaleX = this.ob.scaleY = size;
     }
 
-    restore() {
+    restore(rotate=true) {
         this.ob.translateX = this.ob.translateY = 0;
-        this.ob.rotateZ = 0;
+        !!rotate && (this.ob.rotateZ = 0);
         this.ob.scaleX = this.ob.scaleY = 1;
         this.ob.originX = this.ob.originY = 0;
     }
@@ -270,20 +327,24 @@ class ImageView extends Component {
         this.ob && this.ob.style && (this.ob.style.webkitTransition = '0');
     }
 
-    checkInArea(deltaX = 0, deltaY = 0) {
-        const { scaleX, translateX, translateY, originX, originY } = this.ob,
+    checkBoundary(deltaX = 0, deltaY = 0) {
+        // console.log(this.ob.width, this.ob.height);
+        const { scaleX, translateX, translateY, originX, originY, width, height } = this.ob,
             rate = this.ob.getAttribute('rate');
 
         if(scaleX !== 1 || scaleX !== rate){
-            const rangeLeft = (scaleX - 1) * this.screenWidth / 2 + originX,
-                rangeRight = -(scaleX - 1) * this.screenWidth / 2 + originX,
-                rangeUp = (scaleX - 1) * this.screenHeight / 2 + originY,
-                rangeDown = -(scaleX - 1) * this.screenHeight / 2 + originY;
+            // include long picture
+            const rangeLeft = (scaleX - 1) * (width / 2 + originX) + originX,
+                rangeRight = -(scaleX - 1) * (width / 2 - originX) + originX,
+                rangeUp = (scaleX - 1) * (height / 2 + originY) + originY,
+                rangeDown = -(scaleX - 1) * (height / 2 - originY) + originY;
 
-            if(translateX - originX + deltaX <= rangeLeft
-                && translateX - originX + deltaX >= rangeRight
-                && translateY - originY + deltaY <= rangeUp
-                && translateY - originY + deltaY >= rangeDown ) {
+            // console.log(rangeLeft, rangeRight, rangeUp, rangeDown);
+
+            if(translateX + deltaX <= rangeLeft
+                && translateX + deltaX >= rangeRight
+                && translateY + deltaY <= rangeUp
+                && translateY + deltaY >= rangeDown ) {
                 return true;
             }
         }

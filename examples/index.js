@@ -4,14 +4,17 @@ import { SingleImgView } from './src/index.js'
 // import ImageView from 'react-imageview'
 
 // import 'react-imageview/dist/react-imageview.css'
+import Mlogger from '@tencent/mlogger'
 
 class Main extends Component {
     constructor(){
         super();
+        Mlogger.init({});
     }
 
     render() {
         let imagelist = [
+            'https://p.qpic.cn/qqconadmin/0/e4a67754b2d1485aa186a4d38dbf07e1/0',
             'https://gpic.qpic.cn/gbar_pic/2aqluyraXicEfqicaK3aV4iaib5icib78qF0eFxokIEKSewIg8hQW0kiavCQg/1000',
             'https://gpic.qpic.cn/gbar_pic/3MSgRdnPzZAQnkIModguuoU1PXSKZUup1B67V82b3KicfhjAVwh19BRFia4DgWfxgg/1000',
             'https://gpic.qpic.cn/gbar_pic/2aqluyraXicEfqicaK3aV4iazVolQTREmcvaEG92Hy9oibhyDJHNzu1s3w/1000',
@@ -39,7 +42,27 @@ class Main extends Component {
         SingleImgView.show({
             imagelist,
             current,
-            close: ()=>{SingleImgView.hide()}
+            maxScale: 3,
+            close: ()=>{SingleImgView.hide()},
+            initCallback: ()=>{
+                // 禁止右滑关闭webview
+                // if(mqq){
+                //     mqq.ui.setWebViewBehavior({
+                //         swipeBack: 0
+                //     });
+
+                //     // 禁用系统的长按功能(如果没有配置长按事件则启用系统长按事件)
+                //     if (mqq.compare('5.8') > -1) {
+                //         mqq.invoke('ui', 'disableLongPress', {
+                //             enable: true
+                //         });
+                //     } else if (mqq.compare('5.8') > -1) {
+                //         mqq.invoke('ui', 'disableLongPress', {
+                //             enable: false
+                //         });
+                //     }
+                // }
+            }
         })
     }
 }
